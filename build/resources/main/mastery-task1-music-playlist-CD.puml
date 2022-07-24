@@ -1,0 +1,81 @@
+@startuml
+class AddSongToPlaylistActivity {
+    playlistDao: PlaylistDao
+    albumTrackDao: AlbumTrackDao
+    handleRequest(final AddSongToPlaylistRequest addSongToPlaylistRequest, Context context): AddSongToPlaylistResult
+}
+class CreatePlaylistActivity {
+    playlistDao: PlaylistDao
+    handleRequest(final CreatePlaylistRequest createPlaylistRequest, Context context): CreatePlaylistResult
+}
+class GetPlaylistActivity {
+    playlistDao: PlaylistDao
+    handleRequest(final GetPlaylistRequest getPlaylistRequest, Context context): GetPlaylistResult
+}
+class GetPlaylistSongsActivity {
+    playlistDao: PlaylistDao
+    handleRequest(final GetPlaylistSongsRequest getPlaylistSongsRequest, Context context): GetPlaylistSongsResult
+}
+class UpdatePlaylistActivity {
+    playlistDao: PlaylistDao
+    handleRequest(final UpdatePlaylistRequest updatePlaylistRequest, Context context): UpdatePlaylistResult
+}
+class AlbumTrackDao {
+    dynamoDbMapper: DynamoDBMapper
+}
+class PlaylistDao {
+    dynamoDbMapper: DynamoDBMapper
+    getPlaylist(String id): Playlist
+
+}
+
+class AlbumTrack {
+
+    @DynamoDBHashKey asin: String
+    @DynamoDBRangeKey trackNumber: Integer
+    albumName: String
+    songTitle: String
+}
+class Playlist {
+    @DynamoDBHashKey id: String
+    name: String
+    customerId: String
+    songCount: Integer
+    tags: Set<String>
+    songList: List<AlbumTrack>
+}
+class AlbumTrackNotFoundException {
+    serialVersionUID: long
+}
+class InvalidAttributeValueException {
+    serialVersionUID: long
+}
+class PlaylistNotFoundException {
+    serialVersionUID: long
+}
+class InvalidAttributeChangeException {
+    serialVersionUID: long
+}
+class InvalidAttributeException {
+    serialVersionUID: long
+}
+Playlist o-- AlbumTrack
+AddSongToPlaylistActivity o--- AlbumTrackDao
+CreatePlaylistActivity o--  PlaylistDao
+AddSongToPlaylistActivity o-- PlaylistDao
+GetPlaylistActivity o-- PlaylistDao
+GetPlaylistSongsActivity o-- PlaylistDao
+UpdatePlaylistActivity o-- PlaylistDao
+Playlist o-up- PlaylistDao
+AlbumTrack o-up- AlbumTrackDao
+AddSongToPlaylistActivity ..up.. AlbumTrackNotFoundException: throws
+AddSongToPlaylistActivity ..up.. PlaylistNotFoundException: throws
+GetPlaylistActivity ..up.. PlaylistNotFoundException: throws
+CreatePlaylistActivity ..up.. InvalidAttributeValueException: throws
+UpdatePlaylistActivity ..up.. AlbumTrackNotFoundException: throws
+UpdatePlaylistActivity ..up.. PlaylistNotFoundException: throws
+UpdatePlaylistActivity ..up.. InvalidAttributeChangeException: throws
+GetPlaylistSongsActivity ..up.. PlaylistNotFoundException: throws
+InvalidAttributeException <|-- InvalidAttributeValueException
+InvalidAttributeException <|-- InvalidAttributeChangeException
+@enduml
